@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Using Parcel with OpenLayers</title>
+        <style>
+            #map {
+                width: 80vw;
+                height: 80vh;
+            }
+        </style>
+    </head>
+    <body>
+        <span
+            >Valid file extensions: csv and xlsx; Requires GPS positions files
+            from MiX Telematics</span
+        >
+        <br />
+        <input type="file" name="files" id="csv-file" />
+        <br />
+        <span id="status"></span>
+        <br />
+        <span>Max speed: </span> <span id="speed"></span><span>km/h</span>
+
+        <div id="map"></div>
+        <script src="./index.js"></script>
+    </body>
+</html>
