@@ -27,6 +27,7 @@ const map = new Map({
 });
 function fitView(map, vector) {
     map.getView().fit(vector.getSource().getExtent(), {
+        size: map.getSize(),
         padding: [20, 20, 20, 20]
     });
 }
