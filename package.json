@@ -15,7 +15,9 @@
     "dependencies": {
         "csv-parser": "^2.3.2",
         "express": "^4.17.1",
+        "html-to-image": "^0.1.1",
         "jquery": "^3.4.1",
+        "jspdf": "^1.5.3",
         "ol": "^6.1.1",
         "papaparse": "^5.1.0",
         "xlsx": "^0.15.2"

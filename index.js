@@ -8,7 +8,8 @@ import LineString from 'ol/geom/LineString';
 import Papa from 'papaparse';
 import $ from 'jquery';
 import XLSX from 'xlsx';
-
+import { toJpeg } from 'html-to-image';
+import jsPDF from 'jspdf';
 var vector = null;
 var max = 0;
 var raster = new TileLayer({
@@ -135,4 +136,43 @@ function handleFileSelect(evt) {
 }
 $(document).ready(() => {
     $('#csv-file').change(handleFileSelect);
+});
+
+var exportOptions = {
+    filter: function(element) {
+        return element.className.indexOf('ol-control') === -1;
+    }
+};
+let exportButton = $('#export');
+exportButton.click(() => {
+    console.log('click');
+    $('#status').html('printing page...');
+    exportButton.disabled = true;
+    document.body.style.cursor = 'progress';
+    let format = 'A4';
+    let resolution = 300;
+    let dim = [297, 210];
+    let width = Math.round((dim[0] * resolution) / 25.4);
+    let height = (height = Math.round((dim[1] * resolution) / 25.4));
+    let size = map.getSize();
+    var viewResolution = map.getView().getResolution();
+
+    map.once('rendercomplete', () => {
+        $('#status').html('printing page 2...');
+        exportOptions.width = width;
+        exportOptions.height = height;
+        toJpeg(map.getViewport(), exportOptions).then(dataUrl => {
+            var pdf = new jsPDF('landscape', undefined, format);
+            pdf.addImage(dataUrl, 'JPEG', 0, 0, dim[0], dim[1]);
+            pdf.save('map.pdf');
+            map.setSize(size);
+            map.getView().setResolution(viewResolution);
+            exportButton.disabled = false;
+            document.body.style.cursor = 'auto';
+        });
+    });
+    let printSize = [width, height];
+    map.setSize(printSize);
+    let scaling = Math.min(width / size[0], height / size[1]);
+    map.getView().setResolution(viewResolution / scaling);
 });
