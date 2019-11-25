@@ -19,6 +19,7 @@ var raster = new TileLayer({
 const map = new Map({
     target: 'map',
     layers: [raster],
+    controls: [],
     view: new View({
         center: fromLonLat([30.4997161310166, -29.7572306357324]),
         zoom: 4
