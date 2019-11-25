@@ -21,8 +21,16 @@ const map = new Map({
     layers: [raster],
     view: new View({
         center: fromLonLat([30.4997161310166, -29.7572306357324]),
-        zoom: 15
+        zoom: 4
     })
+});
+function fitView(map, vector) {
+    map.getView().fit(vector.getSource().getExtent(), {
+        padding: [20, 20, 20, 20]
+    });
+}
+$('#btn-fit').click(() => {
+    fitView(map, vector);
 });
 function splitRoute(coordinates) {
     let routes = [];
@@ -68,9 +76,7 @@ function getRoute(coordinates) {
     }
     vector.getSource().addFeatures(features);
     map.addLayer(vector);
-    map.getView().fit(vector.getSource().getExtent(), {
-        padding: [20, 20, 20, 20]
-    });
+    fitView(map, vector);
 }
 function setCoordinates(file) {
     max = 0;
