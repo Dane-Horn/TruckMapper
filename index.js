@@ -30,7 +30,11 @@ function splitRoute(coordinates) {
     while (i < coordinates.length) {
         let [lon, lat] = coordinates[i];
         let [prevLon, prevLat] = coordinates[i - 1];
-        if (Math.abs(lon - prevLon) > 0.05 || Math.abs(lat - prevLat) > 0.05) {
+        let dist = Math.sqrt(
+            Math.pow(Math.abs(lon - prevLon), 2) +
+                Math.pow(Math.abs(lat - prevLat) > 0.05, 2)
+        );
+        if (dist > 0.05) {
             let subroute = coordinates.splice(0, i);
 
             routes.push(subroute);
