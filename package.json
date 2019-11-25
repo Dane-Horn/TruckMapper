@@ -6,7 +6,8 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "node server.js",
-        "builthtml": "parcel build --public-url . index.html",
+        "servehtml": "parcel index.html",
+        "buildhtml": "parcel build --public-url . index.html",
         "serve": "node server.js"
     },
     "keywords": [],
