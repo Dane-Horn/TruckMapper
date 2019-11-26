@@ -146,11 +146,10 @@ var exportOptions = {
 let exportButton = $('#export');
 exportButton.click(() => {
     console.log('click');
-    $('#status').html('printing page...');
     exportButton.disabled = true;
     document.body.style.cursor = 'progress';
     let format = 'A4';
-    let resolution = 300;
+    let resolution = 150;
     let dim = [297, 210];
     let width = Math.round((dim[0] * resolution) / 25.4);
     let height = (height = Math.round((dim[1] * resolution) / 25.4));
@@ -158,7 +157,6 @@ exportButton.click(() => {
     var viewResolution = map.getView().getResolution();
 
     map.once('rendercomplete', () => {
-        $('#status').html('printing page 2...');
         exportOptions.width = width;
         exportOptions.height = height;
         toJpeg(map.getViewport(), exportOptions).then(dataUrl => {
