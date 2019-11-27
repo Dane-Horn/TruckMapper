@@ -3,7 +3,7 @@ import { Map, View, Feature } from 'ol';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat } from 'ol/proj';
 import { Style, Stroke } from 'ol/style';
-import { OSM, Vector as VectorSource, BingMaps, CartoDB } from 'ol/source';
+import { OSM, Vector as VectorSource, BingMaps, CartoDB, XYZ } from 'ol/source';
 import LineString from 'ol/geom/LineString';
 import Papa from 'papaparse';
 import $ from 'jquery';
@@ -17,9 +17,20 @@ var raster = new TileLayer({
         url: 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png'
     })
 });
+
+var satellite = new TileLayer({
+    source: new XYZ({
+        attributions: ['Powered by Esri',
+                       'Source: Esri, DigitalGlobe, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community'],
+        attributionsCollapsible: false,
+        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        maxZoom: 23
+      })
+});
+
 const map = new Map({
     target: 'map',
-    layers: [raster],
+    layers: [satellite],
     controls: [],
     view: new View({
         center: fromLonLat([30.4997161310166, -29.7572306357324]),
