@@ -11,31 +11,35 @@
         />
     </head>
     <body>
-        <span
-            >Valid file extensions: csv and xlsx; Requires GPS positions files
-            from MiX Telematics</span
-        >
-        <br />
         <input type="file" name="files" id="csv-file" />
         <br />
         <button id="btn-fit">Fit View to Route</button>
         <br />
         <button id="export">Export to PDF</button>
+        <select name="dpi" id="dpi-select">
+            <option value="75">75</option>
+            <option value="150">150</option>
+            <option value="300">300</option>
+            <option value="450">450</option>
+            <option value="600">600</option>
+        </select>
         <br />
         <div class="container-fluid justify-content-start">
             <div class="row justify-content-start">
                 <div class="col-auto">
                     <div class="container">
                         <div class="row">
-                            <span>Max speed: </span> <span id="speed"></span
-                            ><span>km/h</span>
+                            <span id="speed"></span>
+                        </div>
+                        <div class="row">
+                            <span id="readings"></span>
                         </div>
                         <div class="row">
                             <span id="status"></span>
                         </div>
                     </div>
                 </div>
-                <div id="map" class="col" style="height: 80vh;"></div>
+                <div id="map" class="col" style="height: 80vh"></div>
             </div>
         </div>
         <script src="./index.js"></script>

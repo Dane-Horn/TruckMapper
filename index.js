@@ -10,37 +10,37 @@ import $ from 'jquery';
 import XLSX from 'xlsx';
 import { toJpeg } from 'html-to-image';
 import jsPDF from 'jspdf';
-var vector = null;
-var max = 0;
-var raster = new TileLayer({
+let appId = 'Y786mSiJ1ODtUX2xLrbT';
+let appCode = 'e7ipsyDlKHhiHLPhNUO9Sg';
+let vector = null;
+let max = 0;
+let raster = new TileLayer({
     source: new OSM({
-        url: 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png'
-    })
+        url: 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png',
+    }),
 });
 
-var satellite = new TileLayer({
+let satellite = new TileLayer({
     source: new XYZ({
-        attributions: ['Powered by Esri',
-                       'Source: Esri, DigitalGlobe, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community'],
-        attributionsCollapsible: false,
-        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        maxZoom: 23
-      })
+        url: `https://{1-4}.${'aerial'}.maps.cit.api.here.com/${'maptile'}/2.1/maptile/newest/${'hybrid.day'}/{z}/{x}/{y}/128/png?app_id=${appId}&app_code=${appCode}`,
+    }),
 });
 
 const map = new Map({
     target: 'map',
     layers: [satellite],
     controls: [],
+
     view: new View({
         center: fromLonLat([30.4997161310166, -29.7572306357324]),
-        zoom: 4
-    })
+        zoom: 4,
+    }),
 });
+map.setSize([700, 700]);
 function fitView(map, vector) {
     map.getView().fit(vector.getSource().getExtent(), {
         size: map.getSize(),
-        padding: [20, 20, 20, 20]
+        padding: [20, 20, 20, 20],
     });
 }
 $('#btn-fit').click(() => {
@@ -70,7 +70,7 @@ function splitRoute(coordinates) {
 function getRoute(coordinates) {
     let source = new VectorSource({ wrapX: false });
     vector = new VectorLayer({
-        source
+        source,
     });
     let routes = splitRoute(coordinates);
     let features = [];
@@ -80,7 +80,7 @@ function getRoute(coordinates) {
     for (let route of routes) {
         feature = new Feature();
         featureStyle = new Style({
-            stroke: new Stroke({ color: 'red' })
+            stroke: new Stroke({ color: 'rgba(255, 0, 0, 0.5)', width: 2 }),
         });
         feature.setStyle(featureStyle);
         geometry = new LineString(route);
@@ -88,9 +88,12 @@ function getRoute(coordinates) {
         feature.setGeometry(geometry);
         features.push(feature);
     }
+    $('#status').html('Adding route to map...');
     vector.getSource().addFeatures(features);
     map.addLayer(vector);
+    console.log(vector.setZIndex(0));
     fitView(map, vector);
+    $('#map').width = $('#status').html('Route added!');
 }
 function setCoordinates(file) {
     max = 0;
@@ -108,23 +111,25 @@ function setCoordinates(file) {
             let coordinates = results.data.map(({ Longitude, Latitude }) => {
                 return [Longitude, Latitude];
             });
-            $('#speed').text(String(max));
-            $('#status').html(
-                `First reading: ${
+            $('#speed').text(`Max speed: ${max}km/h`);
+            $('#readings').html(
+                `From: ${
                     results.data[0][
                         'Time of reading (South Africa Standard Time)'
                     ]
-                } <br> Last reading: ${
+                } <br>To: ${
                     results.data.pop()[
                         'Time of reading (South Africa Standard Time)'
                     ]
                 }`
             );
             getRoute(coordinates);
-        }
+            $('#status').html('File parsed!');
+        },
     });
 }
 function handleFileSelect(evt) {
+    $('#readings').html('');
     $('#status').html('');
     $('#speed').html('');
     map.removeLayer(vector);
@@ -135,8 +140,8 @@ function handleFileSelect(evt) {
     }
     let reader = new FileReader();
     reader.onload = function(e) {
-        var data = new Uint8Array(e.target.result);
-        var workbook = XLSX.read(data, { type: 'array' });
+        let data = new Uint8Array(e.target.result);
+        let workbook = XLSX.read(data, { type: 'array' });
         $('#status').html('converting excel to csv...');
         file = XLSX.utils.sheet_to_csv(workbook.Sheets['Data']);
         setCoordinates(file);
@@ -149,37 +154,42 @@ $(document).ready(() => {
     $('#csv-file').change(handleFileSelect);
 });
 
-var exportOptions = {
+let exportOptions = {
     filter: function(element) {
         return element.className.indexOf('ol-control') === -1;
-    }
+    },
 };
 let exportButton = $('#export');
 exportButton.click(() => {
-    console.log('click');
     exportButton.disabled = true;
     document.body.style.cursor = 'progress';
     let format = 'A4';
-    let resolution = 150;
+    let resolution = $('#dpi-select').val();
     let dim = [297, 210];
     let width = Math.round((dim[0] * resolution) / 25.4);
     let height = (height = Math.round((dim[1] * resolution) / 25.4));
     let size = map.getSize();
-    var viewResolution = map.getView().getResolution();
+    let viewResolution = map.getView().getResolution();
 
     map.once('rendercomplete', () => {
+        $('#status').html('converting map to jpeg...');
         exportOptions.width = width;
         exportOptions.height = height;
         toJpeg(map.getViewport(), exportOptions).then(dataUrl => {
-            var pdf = new jsPDF('landscape', undefined, format);
+            $('#status').html('creating pdf file...');
+            let pdf = new jsPDF('landscape', undefined, format);
             pdf.addImage(dataUrl, 'JPEG', 0, 0, dim[0], dim[1]);
+            $('#status').html('downloading pdf file...');
             pdf.save('map.pdf');
             map.setSize(size);
             map.getView().setResolution(viewResolution);
             exportButton.disabled = false;
             document.body.style.cursor = 'auto';
+            $('#status').html('');
         });
     });
+    $('#status').html('rendering map at desired dpi...');
+    fitView(map, vector);
     let printSize = [width, height];
     map.setSize(printSize);
     let scaling = Math.min(width / size[0], height / size[1]);
