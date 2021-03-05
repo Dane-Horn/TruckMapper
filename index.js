@@ -104,8 +104,9 @@ function setCoordinates(file) {
         dynamicTyping: true,
         complete: results => {
             max = results.data.reduce((prev, curr) => {
-                if (curr['Veloctiy (km/h)'] > prev)
-                    return curr['Veloctiy (km/h)'];
+                const velocityHeader = (curr['Velocity (km/h)']) ? 'Velocity (km/h)' : 'Veloctiy (km/h)';
+                if (curr[velocityHeader] > prev)
+                    return curr[velocityHeader];
                 return prev;
             }, 0);
             let coordinates = results.data.map(({ Longitude, Latitude }) => {
