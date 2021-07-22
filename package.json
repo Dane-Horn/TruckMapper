@@ -20,7 +20,7 @@
         "jspdf": "^1.5.3",
         "ol": "^6.1.1",
         "papaparse": "^5.1.0",
-        "xlsx": "^0.15.2"
+        "xlsx": "^0.17.0"
     },
     "devDependencies": {
         "parcel-bundler": "1.12.3"
